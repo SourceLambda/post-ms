@@ -10,18 +10,18 @@ import (
 	"github.com/SourceLambda/sourcelambda_post_ms/routes"
 )
 
+// split it in addr:port
 var PORT string = ":8080"
 
 func main() {
 
 	db.DBConnection()
 
-	/* deuda tecnica xd
-	- ESTRUCTURA src/ DE PROYECTOS EN GO, CONFIG GOPATH
-	- .env
+	/* Deuda tecnica xd
 	- recibir n en getPost (y Reviews)
+	- validación crud ops post y review //https://github.com/go-gorm/gorm/blob/v1.24.6/finisher_api.go#L161
 	- crear func para los métodos usados en las rutas (no repetir código)
-	- editing/deleting validation?
+	- verificar cambio en NamingStrategy y Save
 	- put/patch?
 	- comentar todo y mejorar respuestas
 	*/
@@ -42,30 +42,11 @@ func main() {
 	r.HandleFunc("/post/{id}", routes.PutPostHandler).Methods("PUT")
 	r.HandleFunc("/post/{id}", routes.DeletePostHandler).Methods("DELETE")
 
+	r.HandleFunc("/review", routes.GetReviewsHandler).Methods("GET")
+	r.HandleFunc("/review/{id}", routes.GetReviewHandler).Methods("GET")
+	r.HandleFunc("/review", routes.CreateReviewHandler).Methods("POST")
+	r.HandleFunc("/review/{id}", routes.PutReviewHandler).Methods("PUT")
+	r.HandleFunc("/review/{id}", routes.DeleteReviewHandler).Methods("DELETE")
+
 	log.Fatal(server.ListenAndServe())
 }
-
-// http.HandleFunc("/", HomeHandler)
-// http.HandleFunc("/post", func(w http.ResponseWriter, r *http.Request) {
-// 	switch r.Method {
-// 	case http.MethodGet:
-// 		routes.GetPostsHandler(w, r)
-// 	case http.MethodPost:
-// 		routes.CreatePostHandler(w, r)
-// 	case http.MethodPut:
-// 		routes.PutPostHandler(w, r)
-// 	case http.MethodDelete:
-// 		routes.DeletePostHandler(w, r)
-// 	default:
-// 		w.WriteHeader(http.StatusMethodNotAllowed)
-// 		w.Write([]byte("Metodo no aceptado"))
-// 	}
-// })
-// http.HandleFunc("/post/{id}", func(w http.ResponseWriter, r *http.Request) {
-// 	switch r.Method {
-// 	case http.MethodGet:
-// 		routes.GetPostHandler(w, r)
-// 	}
-// })
-
-// curl -H "Content-Type:application/json" -X POST -d '{"cityName":"NewYork", "countryCode":"IT", "postalCode": "00166"}' http://localhost:8080/ComuneUtenti/api/city

@@ -13,5 +13,7 @@ func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	var categories []models.Category
 	
 	db.DB.Find(&categories)
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&categories)
 }

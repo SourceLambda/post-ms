@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,17 +14,14 @@ import (
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var posts []models.Post
-	// futuro paginado (pagina n-esima)
+	// futuro paginado (pagina n-esima) 
 	n := 0
 	
-	err := db.DB.Limit(10).Offset(10*n).Find(&posts)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, err)
-	} else {
-		w.WriteHeader(http.StatusFound)
-		json.NewEncoder(w).Encode(&posts)
-	}
+	// returns a tx *gorm.DB object
+	db.DB.Limit(10).Offset(10*n).Find(&posts)
+
+	w.WriteHeader(http.StatusFound)
+	json.NewEncoder(w).Encode(&posts)
 
 }
 
@@ -33,21 +29,12 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	var post models.Post
 	vars := mux.Vars(r)
+	postID := vars["id"]
+	db.DB.First(&post, postID)
 
-	postID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		fmt.Println("Error during conversion")
-		return
-	}
+	w.WriteHeader(http.StatusFound)
+	json.NewEncoder(w).Encode(&post)
 
-	ErrRecordNotFound := db.DB.First(&post, postID)
-	if ErrRecordNotFound != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "ErrRecordNotFound")
-	} else {
-		w.WriteHeader(http.StatusFound)
-		json.NewEncoder(w).Encode(&post)
-	}
 }
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) { // this is the POST method for Post entity
@@ -55,49 +42,42 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) { // this is the 
 	var post models.Post
 	json.NewDecoder(r.Body).Decode(&post)
 
-	result := db.DB.Create(&post)
+	db.DB.Create(&post)
 
-	if result.Error != nil {
-		w.WriteHeader(400)
-		fmt.Fprint(w, "Failed request:", result.Error)
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		fmt.Fprint(w, "Post successfully created")
-	}
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Post successfully created."))
 }
 
 func PutPostHandler(w http.ResponseWriter, r *http.Request) {
-	
+
+	var post models.Post
+	json.NewDecoder(r.Body).Decode(&post)
+
 	vars := mux.Vars(r)
 	postID, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		fmt.Println("Error during conversion")
-		return
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Error to convert string postID to integer."))
+	} else {
+		post.ID = uint32(postID)
+	
+		db.DB.Save(&post)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Post successfully edited"))
 	}
 
-	var post models.Post
-	post.ID = uint32(postID)
-	json.NewDecoder(r.Body).Decode(&post)
-	
-	db.DB.Save(&post)
-	// validation?
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Post successfully edited"))
 }
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	
 	vars := mux.Vars(r)
 
-	postID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		fmt.Println("Error during conversion")
-		return
-	}
+	postID := vars["id"]
 
 	db.DB.Delete(&models.Post{}, postID)
-	// validation?
+	
 	w.WriteHeader(http.StatusContinue)
-	w.Write([]byte("Post deleted succesfully"))
+	w.Write([]byte("Post successfully deleted."))
 	
 }

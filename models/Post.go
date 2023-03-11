@@ -14,7 +14,7 @@ type Post struct {
 	Description   string    `gorm:"not null"`
 	Creation_date string `gorm:"type:date;not null"`
 	Units         uint
-	Price         float32 	`gorm:"not null"`
+	Price         string 	`gorm:"type:money;not null"`
 	Sum_ratings   uint 		
 	Num_ratings   uint 		
 	Views		  uint 		
