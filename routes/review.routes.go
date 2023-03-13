@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -62,6 +63,7 @@ func PutReviewHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error to convert string reviewID to integer."))
 	} else {
 		review.ID = uint32(reviewID)
+		fmt.Print(reviewID)
 
 		db.DB.Save(&review)
 

@@ -17,15 +17,6 @@ func main() {
 
 	db.DBConnection()
 
-	/* Deuda tecnica xd
-	- recibir n en getPost (y Reviews)
-	- validación crud ops post y review //https://github.com/go-gorm/gorm/blob/v1.24.6/finisher_api.go#L161
-	- crear func para los métodos usados en las rutas (no repetir código)
-	- verificar cambio en NamingStrategy y Save
-	- put/patch?
-	- comentar todo y mejorar respuestas
-	*/
-
 	r := mux.NewRouter()
 	server := http.Server{
 		Addr:    PORT,
