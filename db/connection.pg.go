@@ -15,8 +15,6 @@ var DB *gorm.DB
 
 func DBConnection() {
 
-	SetEnvVars()
-
 	db_Host := os.Getenv("DB_HOST")
 	db_Port := os.Getenv("DB_PORT")
 	db_Name := os.Getenv("DB_NAME")
@@ -29,20 +27,19 @@ func DBConnection() {
 	if dbConnError != nil {
 		log.Fatal(dbConnError)
 	}
+	log.Printf("%s DB connection established.\n", db_Name)
 
 	var err error
 	DB, err = gorm.Open(postgres.New(postgres.Config{
 		Conn: sqlDB,
-		
 	}), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
 	})
-
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		log.Println("DB successfully connected")
 	}
+
+	log.Println("DB successfully connected")
 }

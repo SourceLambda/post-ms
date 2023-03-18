@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,16 +11,21 @@ import (
 	"github.com/SourceLambda/sourcelambda_post_ms/routes"
 )
 
-// split it in addr:port
-var PORT string = ":8080"
+var HOST = "localhost"
+var PORT = "8080"
+
+var ADDR = fmt.Sprintf("%s:%s", HOST, PORT)
 
 func main() {
 
+	db.SetEnvVars()
+
 	db.DBConnection()
+	db.FirebaseStorageConn()
 
 	r := mux.NewRouter()
 	server := http.Server{
-		Addr:    PORT,
+		Addr:    ADDR,
 		Handler: r,
 	}
 
