@@ -12,8 +12,8 @@ type Post struct {
 	CategoryID    uint32    `gorm:"not null"`
 	Image         string    `gorm:"not null"`
 	Description   string    `gorm:"not null"`
-	Creation_date string `gorm:"type:date;not null"`
-	Units         uint
+	Creation_date string 	`gorm:"type:date;not null"`
+	Units         uint 		`gorm:"not null"`
 	Price         string 	`gorm:"type:money;not null"`
 	Sum_ratings   uint 		
 	Num_ratings   uint 		

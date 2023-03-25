@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"time"
+	"log"
 
 	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go/v4"
@@ -33,6 +34,7 @@ func FirebaseStorageConn() error {
 	if err != nil {
 		return fmt.Errorf("client.Bucket: %v", err)
 	}
+	log.Print("FirebaseStorage connection established.\n")
 	return nil
 }
 

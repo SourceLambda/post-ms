@@ -11,12 +11,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func MultipartHandler(mr *multipart.Reader, postMap map[string]string) (descName, imgName string) {
+// write some documentation :v
+func MultipartHandler(mr *multipart.Reader, postMap map[string]string) (imgName string, err error) {
 
-	// the filename of both image and html files, with its extensions
-	// this values will be returned
-	var desc string
-	var img string
+	var imgFilename string
 
 	for {
 		// each part is a form-data field, files too
@@ -26,41 +24,29 @@ func MultipartHandler(mr *multipart.Reader, postMap map[string]string) (descName
 		}
 		if err != nil {
 			log.Print(err)
-			return
+			return "", err
 		}
 
 		// if p is reading a file, we call the db.CreateFile()
 		if p.FileName() != "" {
 
-			// first case, description html file, CORRECT THE NESTED IFs
-			var fileName string
-			if path.Ext(p.FileName()) == ".html" {
-				desc = "htmls/" + uuid.New().String() + path.Ext(p.FileName())
-				fileName = desc
+			imgFilename = "images/" + uuid.New().String() + path.Ext(p.FileName())
 
-			} else {
-				img = "images/" + uuid.New().String() + path.Ext(p.FileName())
-				fileName = img
-			}
-
-			// call of db.CreateFile()
-			err := db.CreateFile(fileName, p)
+			err := db.CreateFile(imgFilename, p)
 			if err != nil {
 				fmt.Print(err)
-				return
+				return "", err
 			}
 		} else {
-
-			// if p is a normal form value, we store it in postMap
 			slurp, err := io.ReadAll(p)
 			if err != nil {
 				log.Print(err)
-				return
+				return "", err
 			}
 			postMap[p.FormName()] = string(slurp)
 		}
 	}
 
-	return desc, img
+	return imgFilename, nil
 
 }

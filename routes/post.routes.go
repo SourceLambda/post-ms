@@ -67,7 +67,7 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(tx.Error.Error()))
 	} else {
-		w.WriteHeader(http.StatusFound)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(&post)
 	}
 
@@ -92,12 +92,16 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	mr := multipart.NewReader(r.Body, params["boundary"])
 
 	// the filename of both image and html files, uuid names
-	descName, imgName := controller.MultipartHandler(mr, postValuesMap)
+	imgName, err := controller.MultipartHandler(mr, postValuesMap)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
 	// quering the url/BUCKET_NAME/o/{FOLDER/FILENAME}?alg=media
 	// get the image (with additional settings).
 	imagePath := fmt.Sprintf("%s/o/%s", os.Getenv("BUCKET_NAME"), imgName)
-	descPath := fmt.Sprintf("%s/o/%s", os.Getenv("BUCKET_NAME"), descName)
 
 	unitsInt, _ := strconv.Atoi(postValuesMap["Units"])
 	categoryIDInt, _ := strconv.Atoi(postValuesMap["CategoryID"])
@@ -106,7 +110,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		Title:         postValuesMap["Title"],
 		CategoryID:    uint32(categoryIDInt),
 		Image:         imagePath,
-		Description:   descPath,
+		Description:   postValuesMap["Description"],
 		Creation_date: postValuesMap["Creation_date"],
 		Units:         uint(unitsInt),
 		Price:         postValuesMap["Price"],
@@ -138,12 +142,16 @@ func PutPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	mr := multipart.NewReader(r.Body, params["boundary"])
 
-	descName, imgName := controller.MultipartHandler(mr, postValuesMap)
+	imgName, err := controller.MultipartHandler(mr, postValuesMap)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
 	// quering the url/BUCKET_NAME/o/{FOLDER/FILENAME}?alg=media
 	// get the image (with additional settings).
 	imagePath := fmt.Sprintf("%s/o/%s", os.Getenv("BUCKET_NAME"), imgName)
-	descPath := fmt.Sprintf("%s/o/%s", os.Getenv("BUCKET_NAME"), descName)
 
 	unitsInt, _ := strconv.Atoi(postValuesMap["Units"])
 	categoryIDInt, _ := strconv.Atoi(postValuesMap["CategoryID"])
@@ -152,7 +160,7 @@ func PutPostHandler(w http.ResponseWriter, r *http.Request) {
 		Title:         postValuesMap["Title"],
 		CategoryID:    uint32(categoryIDInt),
 		Image:         imagePath,
-		Description:   descPath,
+		Description:   postValuesMap["Description"],
 		Creation_date: postValuesMap["Creation_date"],
 		Units:         uint(unitsInt),
 		Price:         postValuesMap["Price"],
