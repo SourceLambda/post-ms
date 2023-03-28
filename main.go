@@ -18,10 +18,14 @@ var ADDR = fmt.Sprintf("%s:%s", HOST, PORT)
 
 func main() {
 
+	/* Para hacer xd:
+	- graphql
+	- *validar campos en el crud // https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme
+	*/
+
 	db.SetEnvVars()
 
 	db.DBConnection()
-	db.FirebaseStorageConn()
 
 	r := mux.NewRouter()
 	server := http.Server{

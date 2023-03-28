@@ -3,16 +3,12 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"mime"
-	"mime/multipart"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
-	controller "github.com/SourceLambda/sourcelambda_post_ms/controllers"
 	"github.com/SourceLambda/sourcelambda_post_ms/db"
 	"github.com/SourceLambda/sourcelambda_post_ms/models"
 )
@@ -76,45 +72,10 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 // this is the POST method for Post entity
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
-	// we store the form-data text values in this map
-	postValuesMap := make(map[string]string)
+	var post models.Post
+	json.NewDecoder(r.Body).Decode(&post)
 
-	_, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	// mr return all the parts in the r.Body
-	// params["boundary"] has 26 hyphen set and a big number
-	// (in postman; that value isn't equal to Content-Type boundary value)
-	mr := multipart.NewReader(r.Body, params["boundary"])
-
-	// the filename of both image and html files, uuid names
-	imgName, err := controller.MultipartHandler(mr, postValuesMap)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	// quering the url/BUCKET_NAME/o/{FOLDER/FILENAME}?alg=media
-	// get the image (with additional settings).
-	imagePath := fmt.Sprintf("%s/o/%s", os.Getenv("BUCKET_NAME"), imgName)
-
-	unitsInt, _ := strconv.Atoi(postValuesMap["Units"])
-	categoryIDInt, _ := strconv.Atoi(postValuesMap["CategoryID"])
-
-	post := models.Post{
-		Title:         postValuesMap["Title"],
-		CategoryID:    uint32(categoryIDInt),
-		Image:         imagePath,
-		Description:   postValuesMap["Description"],
-		Creation_date: postValuesMap["Creation_date"],
-		Units:         uint(unitsInt),
-		Price:         postValuesMap["Price"],
-	}
+	// must implement validation of post fields
 
 	tx := db.DB.Create(&post)
 	if tx.Error != nil {
@@ -128,43 +89,10 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 func PutPostHandler(w http.ResponseWriter, r *http.Request) {
 
-	// we store the form-data text values in this map
-	postValuesMap := make(map[string]string)
+	var post models.Post
+	json.NewDecoder(r.Body).Decode(&post)
 
-	_, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	// same as in CreatePostHandler()
-
-	mr := multipart.NewReader(r.Body, params["boundary"])
-
-	imgName, err := controller.MultipartHandler(mr, postValuesMap)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	// quering the url/BUCKET_NAME/o/{FOLDER/FILENAME}?alg=media
-	// get the image (with additional settings).
-	imagePath := fmt.Sprintf("%s/o/%s", os.Getenv("BUCKET_NAME"), imgName)
-
-	unitsInt, _ := strconv.Atoi(postValuesMap["Units"])
-	categoryIDInt, _ := strconv.Atoi(postValuesMap["CategoryID"])
-
-	post := models.Post{
-		Title:         postValuesMap["Title"],
-		CategoryID:    uint32(categoryIDInt),
-		Image:         imagePath,
-		Description:   postValuesMap["Description"],
-		Creation_date: postValuesMap["Creation_date"],
-		Units:         uint(unitsInt),
-		Price:         postValuesMap["Price"],
-	}
+	// must implement validation of post fields
 
 	// Get the id path variable in /post/{id}
 	// to set the postID to updating its values.
