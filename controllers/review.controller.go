@@ -29,7 +29,7 @@ func ChangeRatingPostUpdate(postID uint32, newRating, oldRating uint) (rowsAffec
 
 	post.ID = postID
 
-	txUpdatePost = db.DB.Model(&post).Update("Sum_ratings", gorm.Expr("Sum_ratings + ?", newRating-oldRating))
+	txUpdatePost = db.DB.Model(&post).Update("Sum_ratings", gorm.Expr("Sum_ratings + ? - ?", newRating, oldRating))
 
 	if txUpdatePost.Error != nil {
 		return 0, txUpdatePost.Error

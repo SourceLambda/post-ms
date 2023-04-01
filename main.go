@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 
@@ -11,19 +12,19 @@ import (
 	"github.com/SourceLambda/sourcelambda_post_ms/routes"
 )
 
-var HOST = "localhost"
-var PORT = "8080"
-
-var ADDR = fmt.Sprintf("%s:%s", HOST, PORT)
-
 func main() {
 
-	/* Para hacer xd:
-	- graphql
-	- *validar campos en el crud // https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme
+	/* deuda tecnica xd:
+	- crear container del ms
+	- enlazar ambos containers
+	- validaciones?
+
 	*/
 
-	db.SetEnvVars()
+	SetEnvVars()
+
+	var HOST = "localhost"
+	var ADDR = fmt.Sprintf("%s:%s", HOST, os.Getenv("POST_MS_PORT"))
 
 	db.DBConnection()
 

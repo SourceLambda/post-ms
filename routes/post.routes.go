@@ -77,6 +77,9 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	// must implement validation of post fields
 
+	fmt.Fprint(w, post.Price)
+	fmt.Fprint(w, post.CategoryID)
+
 	tx := db.DB.Create(&post)
 	if tx.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)

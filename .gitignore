@@ -1,9 +1,6 @@
 ## in this file we set the environment variables
-env.db.go
+env*.go
 
 ## folders
 /files
 /tmp
-
-## firebase permissions
-serviceAccountKey.json
