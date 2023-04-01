@@ -14,13 +14,6 @@ import (
 
 func main() {
 
-	/* deuda tecnica xd:
-	- crear container del ms
-	- enlazar ambos containers
-	- validaciones?
-
-	*/
-
 	SetEnvVars()
 
 	var HOST = "localhost"
