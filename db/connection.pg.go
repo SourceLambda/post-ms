@@ -26,8 +26,8 @@ func DBConnection() {
 	sqlDB, dbConnError := sql.Open("pgx", dsn)
 	if dbConnError != nil {
 		log.Println(dbConnError)
+		return
 	}
-	log.Printf("%s DB connection established.\n", db_Name)
 
 	var err error
 	DB, err = gorm.Open(postgres.New(postgres.Config{
@@ -39,7 +39,7 @@ func DBConnection() {
 	})
 	if err != nil {
 		log.Println(err)
+		return
 	}
-
-	log.Println("DB successfully connected")
+	log.Printf("%s DB successfully connected.\n", db_Name)
 }

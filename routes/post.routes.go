@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/SourceLambda/sourcelambda_post_ms/db"
 	"github.com/SourceLambda/sourcelambda_post_ms/models"
@@ -77,9 +78,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	// must implement validation of post fields
 
-	fmt.Fprint(w, post.Price)
-	fmt.Fprint(w, post.CategoryID)
-
 	tx := db.DB.Create(&post)
 	if tx.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -125,6 +123,15 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	postID := vars["id"]
+
+	var reviews []models.Review
+	deleteRevsTX := db.DB.Clauses(clause.Returning{}).Where("post_id = ?", postID).Delete(&reviews)
+	if deleteRevsTX.Error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(deleteRevsTX.Error.Error()))
+		return
+	}
+	w.Write([]byte(fmt.Sprintf("%d Post's reviews successfylly deleted.\n", len(reviews))))
 
 	tx := db.DB.Delete(&models.Post{}, postID)
 	if tx.Error != nil {

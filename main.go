@@ -12,12 +12,22 @@ import (
 	"github.com/SourceLambda/sourcelambda_post_ms/routes"
 )
 
+/* deuda tecnica xd:
+- crear y usar graphql container
+- retornar reviews de un determinado post
+- validaciones?
+
+*/
+
 func main() {
 
 	SetEnvVars()
 
-	var HOST = "localhost"
-	var ADDR = fmt.Sprintf("%s:%s", HOST, os.Getenv("POST_MS_PORT"))
+	if os.Getenv("POST_MS_PORT") == "" {
+		log.Println("Not env. variable port found, 8080 default port used.")
+		os.Setenv("POST_MS_PORT", "8080")
+	}
+	var ADDR = fmt.Sprintf(":%s", os.Getenv("POST_MS_PORT"))
 
 	db.DBConnection()
 
