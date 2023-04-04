@@ -18,3 +18,8 @@ type OldReview struct {
 	Review_text string `gorm:"not null"`
 	OldRating   uint   `gorm:"not null"`
 }
+
+type RequestBody struct {
+	OldRating uint
+	PostID    uint32
+}

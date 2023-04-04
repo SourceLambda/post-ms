@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"github.com/SourceLambda/sourcelambda_post_ms/controllers"
 	"github.com/SourceLambda/sourcelambda_post_ms/db"
 	"github.com/SourceLambda/sourcelambda_post_ms/models"
 )
@@ -24,23 +25,16 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var tx *gorm.DB
 
 	q := r.URL.Query()
-	pagNumber, err := strconv.Atoi(q.Get("p"))
-	/*
-		case 1: pag == 1, ?p=1 or p not gived:
-			// this can create an error in strconv.Atoi(),
-			// that why it's first case
-			db.Limit().Find(posts)
-		case 2: error, ?p=invalid value:
-			w.Write(error)
-		case 3: pag == some num, ?p=number>1:
-			db.Limit().Offset().Find(posts)
-	*/
-	if q.Get("p") == "1" || q.Get("p") == "" {
-		tx = db.DB.Limit(numPosts).Find(&posts)
-	} else if err != nil {
+	pagNumber, err := strconv.Atoi(q.Get("page"))
+	if err != nil && q.Get("page") != "" || pagNumber < 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-	} else {
+		w.Write([]byte("Error with query param 'page' in 'GET /post' request."))
+		return
+	}
+
+	// page query param not given or greater than 0?
+	if q.Get("page") == "" || pagNumber != 0 {
+		// return n=20 paginated posts
 		tx = db.DB.Limit(numPosts).Offset(numPosts * (pagNumber - 1)).Find(&posts)
 	}
 
@@ -76,7 +70,13 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 	json.NewDecoder(r.Body).Decode(&post)
 
-	// must implement validation of post fields
+	// post data validation
+	isValid, err := controllers.ValidatePostData(post)
+	if !isValid {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err))
+		return
+	}
 
 	tx := db.DB.Create(&post)
 	if tx.Error != nil {
@@ -93,7 +93,13 @@ func PutPostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 	json.NewDecoder(r.Body).Decode(&post)
 
-	// must implement validation of post fields
+	// post data validation
+	isValid, validationErr := controllers.ValidatePostData(post)
+	if !isValid {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(validationErr))
+		return
+	}
 
 	// Get the id path variable in /post/{id}
 	// to set the postID to updating its values.

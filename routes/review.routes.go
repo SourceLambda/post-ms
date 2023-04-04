@@ -10,43 +10,30 @@ import (
 	"github.com/SourceLambda/sourcelambda_post_ms/db"
 	"github.com/SourceLambda/sourcelambda_post_ms/models"
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 func GetReviewsHandler(w http.ResponseWriter, r *http.Request) {
 
-	var reviews []models.Review
 	// return only 20 reviews for paginate
 	numReviews := 20
 
-	var tx *gorm.DB
-
 	q := r.URL.Query()
-	pagNumber, err := strconv.Atoi(q.Get("p"))
-	/*
-		case 1: pag == 1, ?p=1 or p not gived:
-			db.Limit().Find(posts)
-		case 2: error, ?p=invalid value:
-			w.Write(error)
-		case 3: pag == some num, ?p=number>1:
-			db.Limit().Offset().Find(posts)
-	*/
-	if q.Get("p") == "1" || q.Get("p") == "" {
-		tx = db.DB.Limit(numReviews).Find(&reviews)
-	} else if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-	} else {
-		tx = db.DB.Limit(numReviews).Offset(numReviews * (pagNumber - 1)).Find(&reviews)
-	}
 
+	tx, reviews, err := controllers.GetReviewsQueryParams(q, numReviews)
+	if err != "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err))
+		return
+	}
+	// tx can return an error even if err == nil.
 	if tx.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(tx.Error.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(&reviews)
+		return
 	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&reviews)
+
 }
 
 func GetReviewHandler(w http.ResponseWriter, r *http.Request) {
@@ -145,12 +132,7 @@ func DeleteReviewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	reviewID := vars["id"]
 
-	type RequestBody struct {
-		OldRating uint
-		PostID    uint32
-	}
-
-	var body RequestBody
+	var body models.RequestBody
 	json.NewDecoder(r.Body).Decode(&body)
 
 	tx := db.DB.Delete(&models.Review{}, reviewID)
