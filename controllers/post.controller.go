@@ -23,7 +23,7 @@ func ValidatePostData(post models.Post) (valid bool, textErr string) {
 		return false, fmt.Sprintf("Error validating CategoryID field, '%d' invalid value", post.CategoryID)
 	}
 	// Image         string
-	imageRegexp, err := regexp.Compile(`^(\S)+\.(webp|jpg|png)$`)
+	imageRegexp, err := regexp.Compile(`^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/([[:ascii:]])+\/o\/images%2F([a-z0-9\-]+)\.(webp|jpg|png)\?alt=media&token=([a-z0-9\-]+)$`)
 	if err != nil || !imageRegexp.MatchString(post.Image) {
 		return false, fmt.Sprintf("Error validating Image field, '%s' invalid value", post.Image)
 	}
