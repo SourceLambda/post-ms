@@ -57,11 +57,11 @@ func ChangeRatingPostDelete(postID uint32, rating uint) (rowsAffected uint, err 
 	return uint(txUpdatePost.RowsAffected), nil
 }
 
-// A successful GetReviewsQueryParams() returns the
+// A successful GetReviewsByQueryParams() returns the
 // *gorm.DB transaction result and the []reviews
 // received. Otherwise, it returns nil for both
 // transaction and reviews, and an error text.
-func GetReviewsQueryParams(q url.Values, numReviews int) (tx *gorm.DB, reviews []models.Review, err string) {
+func GetReviewsByQueryParams(q url.Values, numReviews int) (tx *gorm.DB, reviews []models.Review, err string) {
 
 	var txResult *gorm.DB
 	var revs []models.Review
@@ -89,7 +89,7 @@ func GetReviewsQueryParams(q url.Values, numReviews int) (tx *gorm.DB, reviews [
 	// postID query param given!, is different to 0?
 	if q.Get("page") == "" && postIDNumber != 0 {
 		// postID > 0, no page query param, get reviews from post
-		txResult = db.DB.Where("post_id = ?", q.Get("postID")).Find(&revs)
+		txResult = db.DB.Where("post_id = ?", q.Get("postID")).Limit(numReviews).Find(&revs)
 	} else
 	// any other case must throw error
 	{

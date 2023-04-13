@@ -19,7 +19,7 @@ func GetReviewsHandler(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
 
-	tx, reviews, err := controllers.GetReviewsQueryParams(q, numReviews)
+	tx, reviews, err := controllers.GetReviewsByQueryParams(q, numReviews)
 	if err != "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err))

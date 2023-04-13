@@ -14,6 +14,14 @@ import (
 
 func main() {
 
+	/*
+
+	deuda tecnica xd:
+	- ver las validaciones del review
+	- mejorar las peticiones ReviewsByQueryParams (como las de Posts)
+
+	*/
+
 	SetEnvVars()
 
 	if os.Getenv("POST_MS_PORT") == "" {

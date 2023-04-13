@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
 	"github.com/SourceLambda/sourcelambda_post_ms/controllers"
@@ -17,34 +16,25 @@ import (
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 
-	var posts []models.Post
-
 	// return only 20 posts for paginate
 	numPosts := 20
 
-	var tx *gorm.DB
-
 	q := r.URL.Query()
-	pagNumber, err := strconv.Atoi(q.Get("page"))
-	if err != nil && q.Get("page") != "" || pagNumber < 0 {
+
+	tx, posts, err := controllers.GetPostsByQueryParams(q, numPosts)
+	if err != "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Error with query param 'page' in 'GET /post' request."))
+		w.Write([]byte(err))
 		return
 	}
-
-	// page query param not given or greater than 0?
-	if q.Get("page") == "" || pagNumber != 0 {
-		// return n=20 paginated posts
-		tx = db.DB.Limit(numPosts).Offset(numPosts * (pagNumber - 1)).Find(&posts)
-	}
-
+	// tx can return an error even if err == nil.
 	if tx.Error != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(tx.Error.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(&posts)
+		return
 	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&posts)
 
 }
 
