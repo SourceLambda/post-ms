@@ -14,14 +14,6 @@ import (
 
 func main() {
 
-	/*
-
-	deuda tecnica xd:
-	- ver las validaciones del review
-	- mejorar las peticiones ReviewsByQueryParams (como las de Posts)
-
-	*/
-
 	SetEnvVars()
 
 	if os.Getenv("POST_MS_PORT") == "" {
@@ -41,9 +33,11 @@ func main() {
 	r.HandleFunc("/", routes.HomeHandler)
 
 	r.HandleFunc("/categories", routes.GetCategoriesHandler).Methods("GET")
-
+	r.HandleFunc("/categories/{id}", routes.GetCategoryHandler).Methods("GET")
+	
 	r.HandleFunc("/post", routes.GetPostsHandler).Methods("GET")
 	r.HandleFunc("/post/{id}", routes.GetPostHandler).Methods("GET")
+	r.HandleFunc("/count-post", routes.GetCountPostsHandler).Methods("GET")
 	r.HandleFunc("/post", routes.CreatePostHandler).Methods("POST")
 	r.HandleFunc("/post/{id}", routes.PutPostHandler).Methods("PUT")
 	r.HandleFunc("/post/{id}", routes.DeletePostHandler).Methods("DELETE")

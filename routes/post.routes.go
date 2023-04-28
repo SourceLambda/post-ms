@@ -54,6 +54,26 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetCountPostsHandler(w http.ResponseWriter, r *http.Request) {
+
+	type Result struct {
+		Count   int
+	}
+	  
+	var result Result
+
+	tx := db.DB.Raw("SELECT COUNT(*) FROM post").Scan(&result)
+	if tx.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(tx.Error.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(fmt.Sprintf("%d", result.Count)))
+	//json.NewEncoder(w).Encode(&result)
+
+}
+
 // this is the POST method for Post entity
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
