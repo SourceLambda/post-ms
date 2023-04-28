@@ -17,8 +17,8 @@ func main() {
 	SetEnvVars()
 
 	if os.Getenv("POST_MS_PORT") == "" {
-		log.Println("Not PORT ENV_VAR found, 8080 default port used.")
-		os.Setenv("POST_MS_PORT", "8080")
+		log.Println("Not PORT ENV_VAR found, 8090 default port used.")
+		os.Setenv("POST_MS_PORT", "8090")
 	}
 	var ADDR = fmt.Sprintf(":%s", os.Getenv("POST_MS_PORT"))
 
