@@ -3,3 +3,6 @@
 
 ## folders
 /files
+
+## executable go files
+*.exe
