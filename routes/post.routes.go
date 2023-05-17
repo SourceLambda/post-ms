@@ -94,7 +94,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(tx.Error.Error()))
 	} else {
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("Post successfully created."))
+		w.Write([]byte(fmt.Sprintf("%d", post.ID)))
 	}
 }
 
